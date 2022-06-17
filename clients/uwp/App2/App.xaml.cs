@@ -1,20 +1,7 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
+﻿using Microsoft.Identity.Client;
+using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,6 +13,40 @@ namespace App2
     /// </summary>
     public partial class App : Application
     {
+        private static string DomainName = "";
+        private static string ClientId = "";
+
+        private static string Tenant = $"{DomainName}.onmicrosoft.com";
+        private static string AzureADB2CHostname = $"{DomainName}.b2clogin.com";
+        public static string PolicySignUpSignIn = "b2c_1_susi";
+        private static string PolicyEditProfile = "b2c_1_edit_profile";
+        private static string PolicyResetPassword = "b2c_1_reset";
+        private static string RedirectUri = $"https://{AzureADB2CHostname}/oauth2/nativeclient";
+
+        public static string[] ApiScopes = { $"https://{DomainName}.onmicrosoft.com/{ClientId}/demo.read" };
+        public static string ApiEndpoint = $"https://{DomainName}.azurewebsites.net/hello";
+
+        private static string AuthorityBase = "https://{hostname}/tfp/{tenant}/{policy}/".Replace("{hostname}", AzureADB2CHostname).Replace("{tenant}", Tenant);
+        public static string AuthoritySignInSignUp = AuthorityBase.Replace("{policy}", PolicySignUpSignIn);
+        public static string AuthorityEditProfile = AuthorityBase.Replace("{policy}", PolicyEditProfile);
+        public static string AuthorityResetPassword = AuthorityBase.Replace("{policy}", PolicyResetPassword);
+
+        public static IPublicClientApplication PublicClientApp { get; private set; }
+
+        static App()
+        {
+            PublicClientApp = PublicClientApplicationBuilder.Create(ClientId)
+                .WithB2CAuthority(AuthoritySignInSignUp)
+                .WithRedirectUri(RedirectUri)
+                .Build();
+        }
+        private static void Log(LogLevel level, string message, bool containsPii)
+        {
+            string logs = $"{level} {message}{Environment.NewLine}";
+            File.AppendAllText(System.Reflection.Assembly.GetExecutingAssembly().Location + ".msalLogs.txt", logs);
+        }
+
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().

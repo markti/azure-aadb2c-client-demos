@@ -1,3 +1,11 @@
 **/bin/*
 **/obj/*
 **/*.csproj.user
+**/local.bat
+**/terraform.tfvars
+**/.terraform/*
+**/.terraform*
+.gitignore
+**/*.tfstate*
+**/.vs
+**/client_info.txt
