@@ -9,3 +9,4 @@
 **/*.tfstate*
 **/.vs
 **/client_info.txt
+**/.DS_Store
